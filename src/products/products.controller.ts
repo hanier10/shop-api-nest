@@ -40,4 +40,11 @@ export class ProductsController {
   }
 
   //Crear método patch, para actualizar
+  @Patch(':id')
+  update(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body() updateProductoDto: CreateProductDto,
+  ) {
+    return this.productServiceRepo.update(id, updateProductoDto);
+  }
 }
