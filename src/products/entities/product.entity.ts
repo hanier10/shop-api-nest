@@ -1,4 +1,5 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { ProductImage } from './product-image.entity';
 
 @Entity()
 export class Product {
@@ -10,4 +11,11 @@ export class Product {
 
   @Column({ type: 'numeric' })
   price: number;
+
+  //Relacion de uno a muchos
+  //Un producto puede tener muchas imagenes
+  @OneToMany(() => ProductImage, (productImage) => productImage.product, {
+    cascade: true,
+  })
+  images?: ProductImage[];
 }

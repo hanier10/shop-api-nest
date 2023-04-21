@@ -3,19 +3,33 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Product } from './entities/product.entity';
 import { CreateProductDto } from './dto/product.dto';
+import { ProductImage } from './entities/product-image.entity';
 
 @Injectable()
 export class ProductsService {
   constructor(
     @InjectRepository(Product)
     private readonly productRepository: Repository<Product>,
+    @InjectRepository(ProductImage)
+    private readonly imageRepository: Repository<ProductImage>,
   ) {}
 
   //Metodo para crear un producto
-  async create(productoDto: CreateProductDto) {
+  /*   async create(productoDto: CreateProductDto) {
     const product = this.productRepository.create(productoDto);
     await this.productRepository.save(product);
 
+    return product;
+  } */
+  async create(productoDto: CreateProductDto) {
+    const { images = [], ...detalleProducto } = productoDto;
+    const product = await this.productRepository.create({
+      ...detalleProducto,
+      images: images.map((image) =>
+        this.imageRepository.create({ url: image }),
+      ),
+    });
+    await this.productRepository.save(product);
     return product;
   }
 
@@ -37,13 +51,22 @@ export class ProductsService {
   }
 
   //Actualizar un producto especifico
-  async update(id: string, cambios: CreateProductDto) {
-    const findProduct = await this.findOne(id);
-    const updatedProducto = await this.productRepository.merge(
-      findProduct,
-      cambios,
-    );
+  // async update(id: string, cambios: CreateProductDto) {
+  //   const findProduct = await this.findOne(id);
+  //   const updatedProducto = await this.productRepository.merge(
+  //     findProduct,
+  //     cambios,
+  //   );
 
-    return this.productRepository.save(updatedProducto);
+  //   return this.productRepository.save(updatedProducto);
+  // }
+  async update(id: string, cambios: CreateProductDto) {
+    const product = await this.productRepository.preload({
+      id: id,
+      ...cambios,
+      images: [],
+    });
+    await this.productRepository.save(product);
+    return product;
   }
 }

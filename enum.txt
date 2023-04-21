@@ -1,0 +1,23 @@
+1. Restaurante - Anny
+2. Cafetería - Michelle
+3. Tienda de ropa - Tania
+4. Supermercado - Jefferson
+5. Tienda de electrónica - Johana
+6. Tienda de deportes - Diogenes
+7. Peluquería - Nurian
+8. Spa - Oscar
+9. Tienda de mascotas - Santos
+10. Floristería - Arlen
+11. Joyería - Avimilex
+12. Tienda de muebles - Elliam
+13. Tienda de libros - Jasson
+14. Ferretería - Freddys
+15. Tienda de materiales de construcción - Bryttem
+16. Estación de servicio - Jonathan
+
+
+
+Farmacia
+Tienda de artículos para el hogar
+Panadería
+Tienda de regalos
