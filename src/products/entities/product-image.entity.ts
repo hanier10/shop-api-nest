@@ -11,6 +11,8 @@ export class ProductImage {
 
   //Relacion de muchos a uno
   //Muchas imagenes pueden ser de un producto
-  @ManyToOne(() => Product, (product) => product.images)
+  @ManyToOne(() => Product, (product) => product.images, {
+    onDelete: 'CASCADE',
+  })
   product: Product;
 }

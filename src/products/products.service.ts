@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { DataSource, Repository } from 'typeorm';
 import { Product } from './entities/product.entity';
 import { CreateProductDto } from './dto/product.dto';
 import { ProductImage } from './entities/product-image.entity';
@@ -12,6 +12,7 @@ export class ProductsService {
     private readonly productRepository: Repository<Product>,
     @InjectRepository(ProductImage)
     private readonly imageRepository: Repository<ProductImage>,
+    private readonly dataSource: DataSource,
   ) {}
 
   //Metodo para crear un producto
@@ -35,7 +36,9 @@ export class ProductsService {
 
   //Metodo para visualizar todos los productos
   findAll() {
-    return this.productRepository.find();
+    return this.productRepository.find({
+      relations: ['images'],
+    });
   }
 
   //Metodo para visualizar un producto especifico
@@ -61,12 +64,33 @@ export class ProductsService {
   //   return this.productRepository.save(updatedProducto);
   // }
   async update(id: string, cambios: CreateProductDto) {
+    const { images, ...updateAll } = cambios;
     const product = await this.productRepository.preload({
       id: id,
-      ...cambios,
-      images: [],
+      ...updateAll,
     });
-    await this.productRepository.save(product);
+
+    //Consultar a la base de datos para modificarla
+    const queryRunner = await this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+
+    //Si vienen nuevas imagenes, que se eliminen las anteriores
+    if (images) {
+      await queryRunner.manager.delete(ProductImage, { product: { id } });
+
+      //Si vienen nuevas imagenes que las agregue a la tabla de ProductImage
+      product.images = images.map((image) =>
+        this.imageRepository.create({ url: image }),
+      );
+    } else {
+      product.images = await this.imageRepository.findBy({ product: { id } });
+    }
+
+    //Salvamos y cerramos la consulta
+    await queryRunner.manager.save(product);
+    await queryRunner.commitTransaction();
+    await queryRunner.release();
     return product;
   }
 }
