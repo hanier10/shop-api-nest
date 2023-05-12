@@ -12,6 +12,9 @@ export class Product {
   @Column({ type: 'numeric' })
   price: number;
 
+  @Column({ type: 'varchar', nullable: true })
+  filename: string;
+
   //Relacion de uno a muchos
   //Un producto puede tener muchas imagenes
   @OneToMany(() => ProductImage, (productImage) => productImage.product, {

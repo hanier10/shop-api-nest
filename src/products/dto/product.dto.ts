@@ -17,6 +17,11 @@ export class CreateProductDto {
   @IsNotEmpty()
   price: number;
 
+  @IsOptional()
+  @IsString()
+  filename: string;
+
+  //Relaciones
   @IsString({ each: true })
   @IsArray()
   @IsOptional()
